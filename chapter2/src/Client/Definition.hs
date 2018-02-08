@@ -1,6 +1,10 @@
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE NamedFieldPuns  #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ViewPatterns    #-}
 
 module Client.Definition where
+
+import           Data.Char
 
 data Gender
   = Male
@@ -108,3 +112,38 @@ binom n k = binom (n - 1) (k - 1) + binom (n - 1) k
 specialClient :: Client -> Bool
 specialClient (clientName -> "Rejwan Shuvo") = True -- set ViewPatterns
 specialClient _                              = False
+
+data PersonR = PersonR
+  { firstName :: String
+  , lastName  :: String
+  } deriving (Show)
+
+data ClientR
+  = GovOrgR { clientRName :: String }
+  | CompanyR { clientRName :: String
+             , companyId   :: Integer
+             , person      :: PersonR
+             , duty        :: String }
+  | IndividualR { person :: PersonR }
+  deriving (Show)
+
+greet :: ClientR -> String
+greet IndividualR {person = PersonR {firstName = fn}} = "Hi, " ++ fn
+greet CompanyR {clientRName = c}                      = "Hello, " ++ c
+greet GovOrgR {clientRName = c}                       = "Welcome, " ++ c
+
+greet' :: ClientR -> String -- use NamedFieldPuns
+greet' IndividualR {person = PersonR {firstName}} = "Hi, " ++ firstName
+greet' CompanyR {clientRName}                     = "Hello, " ++ clientRName
+greet' GovOrgR {clientRName}                      = "Welcome, " ++ clientRName
+
+greet'' :: ClientR -> String -- use RecordWildCards
+greet'' IndividualR {person = PersonR {..}} = "Hi, " ++ firstName
+greet'' CompanyR {..}                       = "Hello, " ++ clientRName
+greet'' GovOrgR {..}                        = "Welcome, " ++ clientRName
+
+nameInCapitals :: PersonR -> PersonR -- caseClass.copy in scala
+nameInCapitals p@(PersonR {firstName = initial:rest}) =
+  let newName = (toUpper initial) : rest
+  in p {firstName = newName}
+nameInCapitals p@(PersonR {firstName = ""}) = p
