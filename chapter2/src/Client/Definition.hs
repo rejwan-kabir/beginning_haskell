@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase      #-}
 {-# LANGUAGE NamedFieldPuns  #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ViewPatterns    #-}
@@ -5,6 +6,7 @@
 module Client.Definition where
 
 import           Data.Char
+import           Data.Foldable
 
 data Gender
   = Male
@@ -147,3 +149,43 @@ nameInCapitals p@(PersonR {firstName = initial:rest}) =
   let newName = (toUpper initial) : rest
   in p {firstName = newName}
 nameInCapitals p@(PersonR {firstName = ""}) = p
+
+sayHello :: [String] -> [String]
+sayHello names =
+  map
+    (\name ->
+       case name of
+         "shuvo" -> "Hi shuvo"
+         _       -> "Fuck off")
+    names
+
+sayHello' :: [String] -> [String]
+sayHello' =
+  map
+           -- use LambdaCase
+    (\case
+       "shuvo" -> "Hi shuvo"
+       _ -> "Fuck off")
+
+uncurry f (x, y) = f x y
+
+curry f x y = f (x, y)
+
+data InfNumber a
+  = NegativeInf
+  | Number a
+  | PositiveInf
+  deriving (Show)
+
+infMax :: (Ord a) => InfNumber a -> InfNumber a -> InfNumber a
+infMax x NegativeInf         = x
+infMax NegativeInf x         = x
+infMax _ PositiveInf         = PositiveInf
+infMax PositiveInf _         = PositiveInf
+infMax (Number x) (Number y) = Number (max x y)
+
+elem' :: (Eq a) => a -> [a] -> Bool
+x `elem'` xs =
+  case find (== x) xs of
+    Just _  -> True
+    Nothing -> False
