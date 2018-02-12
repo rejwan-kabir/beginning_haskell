@@ -1,12 +1,16 @@
-{-# LANGUAGE LambdaCase      #-}
-{-# LANGUAGE NamedFieldPuns  #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE ViewPatterns    #-}
+{-# LANGUAGE LambdaCase        #-}
+{-# LANGUAGE NamedFieldPuns    #-}
+{-# LANGUAGE ParallelListComp  #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TransformListComp #-}
+{-# LANGUAGE ViewPatterns      #-}
 
 module Client.Definition where
 
 import           Data.Char
 import           Data.Foldable
+import           Data.List
+import           GHC.Exts
 
 data Gender
   = Male
@@ -159,10 +163,9 @@ sayHello names =
          _       -> "Fuck off")
     names
 
-sayHello' :: [String] -> [String]
+sayHello' :: [String] -> [String] -- use LambdaCase
 sayHello' =
   map
-           -- use LambdaCase
     (\case
        "shuvo" -> "Hi shuvo"
        _ -> "Fuck off")
@@ -189,3 +192,29 @@ x `elem'` xs =
   case find (== x) xs of
     Just _  -> True
     Nothing -> False
+
+transformAfterComprehension = [x * y | x <- [1 .. 4], y <- [5 .. 9], then reverse] -- needs TransformListComp
+
+transformUsingAfterComprehension -- the [1,1,1] == 1, the [1,1,2] throws exception
+ = [(the p, m) | x <- [-1, 1, -2], y <- [1, 2, 3], let m = x * y, let p = m > 0, then group by p using groupWith]
+
+parallelListComp = [x * y | x <- [1, 2, 3] | y <- [1, 2, 3]] -- returns [1,4,9]
+
+minSort :: (Ord a) => [a] -> [a]
+minSort =
+  unfoldr
+    (\case
+       [] -> Nothing
+       xs -> Just (m, delete m xs)
+         where m = minimum xs)
+
+foldr2 :: (Maybe (a, b) -> b) -> [a] -> b
+foldr2 f []     = f Nothing
+foldr2 f (x:xs) = f $ Just (x, foldr2 f xs)
+
+mapAsFold2 :: (a -> b) -> [a] -> [b]
+mapAsFold2 f =
+  foldr2
+    (\case
+       Nothing -> []
+       Just (x, xs) -> f x : xs)
