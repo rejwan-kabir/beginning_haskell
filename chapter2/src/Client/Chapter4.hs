@@ -2,41 +2,52 @@
 
 module Client.Chapter4 where
 
-import qualified Data.Map as M
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+import qualified Data.HashSet as HashSet
+import qualified Data.HashMap.Lazy as HashMap
 
--- M.adjust does not change the map if the key is not present,
--- M.insert does.
--- M.alter
---     :: Ord k => (Maybe a -> Maybe a) -> k -> M.Map k a -> M.Map k a
--- M.alter is the mother of insert, delete and adjust
+-- Map.adjust does not change the map if the key is not present,
+-- Map.insert does.
+-- Map.alter
+--     :: Ord k => (Maybe a -> Maybe a) -> k -> Map.Map k a -> Map.Map k a
+-- Map.alter is the mother of insert, delete and adjust
 maps =
-  let m1 = M.singleton "shuvo" 1
-      m2 = M.insert "arshi" 2 m1
-      m3 = M.insert "shuvo" 3 m2
-      m4 = M.insertWith (+) "arshi" 7 m3
+  let m1 = Map.singleton "shuvo" 1
+      m2 = Map.insert "arshi" 2 m1
+      m3 = Map.insert "shuvo" 3 m2
+      m4 = Map.insertWith (+) "arshi" 7 m3
   in (m1, m2, m3, m4)
 
-insert' :: Ord k => k -> a -> M.Map k a -> M.Map k a
-insert' k a =
-  M.alter
+insertMap :: Ord k => k -> a -> Map.Map k a -> Map.Map k a
+insertMap k a =
+  Map.alter
     (\case
        Nothing -> Just a
        Just _ -> Just a)
     k
 
-adjust' :: Ord k => (a -> a) -> k -> M.Map k a -> M.Map k a
-adjust' f =
-  M.alter
+adjustMap :: Ord k => (a -> a) -> k -> Map.Map k a -> Map.Map k a
+adjustMap f =
+  Map.alter
     (\case
        Nothing -> Nothing
        Just a -> Just (f a))
 
-delete' :: Ord k => k -> M.Map k a -> M.Map k a
-delete' = M.alter (\_ -> Nothing)
+deleteMap :: Ord k => k -> Map.Map k a -> Map.Map k a
+deleteMap = Map.alter (\_ -> Nothing)
 
--- M.union, difference, intersection, intersectionWith
+-- Map.union, difference, intersection, intersectionWith
 -- map, foldl, foldr
 -- findMin, findMax, deleteMin, deleteMax, updateMin, updateMax
 mapFoldMap =
-  let m = M.fromList [("shuvo", 100), ("arshi", 10)]
-  in (M.map (* 2) m, M.foldl (+) 0 m)
+  let m = Map.fromList [("shuvo", 100), ("arshi", 10)]
+  in (Map.map (* 2) m, Map.foldl (+) 0 m)
+
+-- Set.size, union, intersection, difference
+-- map , foldl, foldr
+-- findMin, findMax, deleteMin, deleteMax, updateMin, updateMax
+
+
+
+
