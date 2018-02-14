@@ -2,10 +2,10 @@
 
 module Client.Chapter4 where
 
-import qualified Data.Map as Map
-import qualified Data.Set as Set
-import qualified Data.HashSet as HashSet
-import qualified Data.HashMap.Lazy as HashMap
+import qualified Data.HashMap.Lazy as LazyHashMap
+import qualified Data.HashSet      as HashSet
+import qualified Data.Map          as Map
+import qualified Data.Set          as Set
 
 -- Map.adjust does not change the map if the key is not present,
 -- Map.insert does.
@@ -47,7 +47,13 @@ mapFoldMap =
 -- Set.size, union, intersection, difference
 -- map , foldl, foldr
 -- findMin, findMax, deleteMin, deleteMax, updateMin, updateMax
-
-
-
-
+hashMaps =
+  let m1 :: LazyHashMap.HashMap Int Char
+      m1 = LazyHashMap.singleton 1 'a'
+      m2 :: LazyHashMap.HashMap Int Char
+      m2 = LazyHashMap.insert 2 'b' m1
+      m3 :: LazyHashMap.HashMap Int Char
+      m3 = m1 `LazyHashMap.union` m2
+      m4 :: LazyHashMap.HashMap Int Char
+      m4 = m1 `LazyHashMap.intersection` m2
+  in (m1, m2, m3, m4)
